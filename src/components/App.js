@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
@@ -9,6 +9,12 @@ import AddPlacePopup from './AddPlacePopup';
 import ImagePopup from './ImagePopup';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import api from '../utils/api';
+import { Route, Switch, useHistory } from 'react-router-dom';
+import Login from './Login';
+import Register from './Register';
+import ProtectedRoute from './ProtectedRoute';
+import * as authForm from '../utils/authForm';
+import InfoTooltip from './InfoTooltip';
 
 
 function App() {
@@ -19,6 +25,78 @@ function App() {
   const [selectedCard, setSelectedCard] = React.useState({});
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [userData, setUserData] = useState({
+    email: '',
+    password: ''
+  });
+console.log(userData)
+  const history = useHistory();
+  const [isInfoTooltipPopupOpen, setInfoTooltipPopupOpen] = React.useState(false);
+
+  useEffect(() => {
+    tokenCheck();
+  }, );
+
+  const tokenCheck = () => {
+    const jwt = localStorage.getItem('jwt');
+
+    if (jwt){
+      authForm.getContent(jwt).then((res) => {
+        console.log(res)
+        if (res) {
+          setUserData({
+            email: res.email,
+            password: res.password
+          });
+          setLoggedIn(true);
+          history.push('/');
+        }
+      });
+    }
+  }
+
+  const handleRegister = (email, password) => {
+    authForm.register(email, password)
+      .then(data => {
+        console.log(data)
+        if (data) {
+          setUserData({
+            email: data.email,
+            password: data.password
+          });
+          setInfoTooltipPopupOpen(true);
+          setLoggedIn(true);
+          history.push('/');
+        }
+      })
+      .catch(err => console.log(err));
+  }
+
+  const handleLogin = (email, password) => {
+    authForm.authorize(email, password)
+      .then(data => {
+        console.log(data)
+        if (data) {
+          
+          setUserData({
+            email: data.email,
+            password: data.password
+          });
+          
+          setLoggedIn(true);
+          history.push('/');
+        }
+      })
+      .catch(err => console.log(err));
+  }
+
+  const onSignOut = () => {
+    localStorage.removeItem('jwt');
+    setLoggedIn(false);
+    history.push('/sign-in');
+  }
+
 
 
   React.useEffect(()=>{
@@ -89,6 +167,7 @@ function handleAddPlaceSubmit(card) {
       setEditProfilePopupOpen(false);
       setAddPlacePopupOpen(false);
       setDeleteCardPopupOpen(false);
+      setInfoTooltipPopupOpen(false);
       setSelectedCard({});
   };
 
@@ -96,15 +175,28 @@ function handleAddPlaceSubmit(card) {
   return (
     <div className="page">
       <CurrentUserContext.Provider value={currentUser}>
-      <Header/>
-      <Main onEditProfile={handleEditProfileClick} 
-            onEditAvatar={handleEditAvatarClick} 
-            onAddPlace={handleAddPlaceClick}  
-            onCardClick={setSelectedCard}
-            handleCardDelete={handleCardDelete}
-            handleCardLike={handleCardLike}
-            cards={cards} />
+      <Header onSignOut={onSignOut} email={userData.email}/>
+      <Switch>
+        <ProtectedRoute exact path="/"
+              component={Main}
+              loggedIn={loggedIn}
+              onSignOut={onSignOut}
+              onEditProfile={handleEditProfileClick} 
+              onEditAvatar={handleEditAvatarClick} 
+              onAddPlace={handleAddPlaceClick}  
+              onCardClick={setSelectedCard}
+              handleCardDelete={handleCardDelete}
+              handleCardLike={handleCardLike}
+              cards={cards}
+        />
+        <Route path="/sign-up">
+            <Register handleRegister={handleRegister} />
+          </Route>
+        <Route path="/sign-in">
+            <Login handleLogin={handleLogin} tokenCheck={tokenCheck}/>
+        </Route>
       <Footer/>
+      </Switch>
       <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
       <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} />
       <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />
@@ -112,8 +204,9 @@ function handleAddPlaceSubmit(card) {
             <button type="submit" className="popup__button popup__button_type_save popup__button_type_small">Да</button>
       </PopupWithForm>
       <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+      <InfoTooltip isOpen={isInfoTooltipPopupOpen} onClose={closeAllPopups} />
       </CurrentUserContext.Provider>
-    </div>
+    </div>      
   );
 }
 

@@ -46,4 +46,5 @@
 @import url(../src/blocks/profile/__avatar-edit/profile__avatar-edit.css);
 @import url(../src/blocks/popup/__title/_type/popup__title_type_small.css);
 @import url(../src/blocks/popup/__button/_type/popup__button_type_small.css);
-@import url(../src/blocks/body/body.css);  
+@import url(../src/blocks/body/body.css);
+@import url(../src/blocks/login/login.css);
