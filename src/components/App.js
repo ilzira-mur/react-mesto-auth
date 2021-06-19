@@ -33,6 +33,7 @@ function App() {
 console.log(userData)
   const history = useHistory();
   const [isInfoTooltipPopupOpen, setInfoTooltipPopupOpen] = React.useState(false);
+  const [isRegistered, setRegistered] = React.useState(false);
 
   useEffect(() => {
     tokenCheck();
@@ -59,18 +60,24 @@ console.log(userData)
   const handleRegister = (email, password) => {
     authForm.register(email, password)
       .then(data => {
-        console.log(data)
         if (data) {
           setUserData({
             email: data.email,
             password: data.password
           });
           setInfoTooltipPopupOpen(true);
+          setRegistered(true)
           setLoggedIn(true);
           history.push('/');
         }
       })
-      .catch(err => console.log(err));
+      .catch((err) => {
+        if (err === 400) {
+          console.log(`400 - некорректно заполнено одно из полей`);
+          setInfoTooltipPopupOpen(true);
+          setRegistered(false)
+        }
+      });
   }
 
   const handleLogin = (email, password) => {
@@ -88,7 +95,16 @@ console.log(userData)
           history.push('/');
         }
       })
-      .catch(err => console.log(err));
+      .catch((err) => {
+        setInfoTooltipPopupOpen(true);
+        setRegistered(false)
+        if (err === 401) {
+          console.log(`401 — Переданный токен некорректен`);
+        }
+        if (err === 400) {
+          console.log(`400 — Токен не передан или передан не в том формате`);
+        }
+      });
   }
 
   const onSignOut = () => {
@@ -204,7 +220,7 @@ function handleAddPlaceSubmit(card) {
             <button type="submit" className="popup__button popup__button_type_save popup__button_type_small">Да</button>
       </PopupWithForm>
       <ImagePopup card={selectedCard} onClose={closeAllPopups} />
-      <InfoTooltip isOpen={isInfoTooltipPopupOpen} onClose={closeAllPopups} />
+      <InfoTooltip isOpen={isInfoTooltipPopupOpen} onClose={closeAllPopups} isRegistered={isRegistered} />
       </CurrentUserContext.Provider>
     </div>      
   );
