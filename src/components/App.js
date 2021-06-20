@@ -26,14 +26,17 @@ function App() {
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [userData, setUserData] = useState({
-    email: '',
-    password: ''
-  });
-console.log(userData)
+  const [userData, setUserData] = useState({});
+
+
+  
   const history = useHistory();
   const [isInfoTooltipPopupOpen, setInfoTooltipPopupOpen] = React.useState(false);
   const [isRegistered, setRegistered] = React.useState(false);
+
+  
+
+ 
 
   useEffect(() => {
     tokenCheck();
@@ -44,7 +47,6 @@ console.log(userData)
 
     if (jwt){
       authForm.getContent(jwt).then((res) => {
-        console.log(res)
         if (res) {
           setUserData({
             email: res.email,
@@ -68,7 +70,7 @@ console.log(userData)
           setInfoTooltipPopupOpen(true);
           setRegistered(true)
           setLoggedIn(true);
-          history.push('/');
+          history.push('/sign-up');
         }
       })
       .catch((err) => {
@@ -83,14 +85,12 @@ console.log(userData)
   const handleLogin = (email, password) => {
     authForm.authorize(email, password)
       .then(data => {
-        console.log(data)
         if (data) {
-          
           setUserData({
             email: data.email,
             password: data.password
           });
-          
+          console.log(email)
           setLoggedIn(true);
           history.push('/');
         }
@@ -187,11 +187,12 @@ function handleAddPlaceSubmit(card) {
       setSelectedCard({});
   };
 
+
  
   return (
     <div className="page">
       <CurrentUserContext.Provider value={currentUser}>
-      <Header onSignOut={onSignOut} email={userData.email}/>
+      <Header onSignOut={onSignOut} email={userData.email} />
       <Switch>
         <ProtectedRoute exact path="/"
               component={Main}

@@ -15,6 +15,7 @@
   }
   
   .button_type_edit:hover {
+      background: #FFFFFF;
       opacity: 0.6;
       transition: 0.1s linear;
   }

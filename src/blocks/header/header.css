@@ -30,7 +30,15 @@
   line-height: 22px;
   color: #FFFFFF;
   padding-right: 24px;
+  text-decoration: none;
+  cursor: pointer;
 }
 .header__email:last-of-type {
   padding-right: 0;
+}
+
+.header__email:hover {
+  color: #FFFFFF;
+  opacity: 0.6;
+  transition: 0.1s linear;
 }
