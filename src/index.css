@@ -48,3 +48,15 @@
 @import url(../src/blocks/popup/__button/_type/popup__button_type_small.css);
 @import url(../src/blocks/body/body.css);
 @import url(../src/blocks/login/login.css);
+@import url(../src/blocks/login/__title/login__title.css);
+@import url(../src/blocks/login/__form/login__form.css);
+@import url(../src/blocks/login/__button/login__button.css);
+@import url(../src/blocks/login/__input/login__input.css);
+@import url(../src/blocks/login/__signin/login__signin.css);
+@import url(../src/blocks/login/__text/login__text.css);
+@import url(../src/blocks/login/__text/_type/login__text_type_link.css);
+@import url(../src/blocks/popup/__img/popup__img.css);
+@import url(../src/blocks/popup/__paragraph/popup__paragraph.css);
+@import url(../src/blocks/header/__login/header__login.css);
+@import url(../src/blocks/header/__status/header__status.css);
+@import url(../src/blocks/header/__status/_type/header__status_type_link.css);

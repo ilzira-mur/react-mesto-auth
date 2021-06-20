@@ -29,8 +29,8 @@ function Register({ handleRegister }) {
                 <button type="submit" className="button login__button">Зарегистрироваться</button>
             </form>
             <div className="login__signin">
-                <p className="login__signin-text">Уже зарегистрированы?</p>
-                <Link to="/sign-in" className="login__signin-text login__signin-link">Войти</Link>
+                <p className="login__text">Уже зарегистрированы?</p>
+                <Link to="/sign-in" className="login__text login__text_type_link">Войти</Link>
             </div>
         </section>
     );
