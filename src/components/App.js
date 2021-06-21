@@ -26,42 +26,60 @@ function App() {
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [userData, setUserData] = useState({});
-
-
-  
-  const history = useHistory();
+  const [userData, setUserData] = useState({
+    email: '',
+    password: ''
+  });
   const [isInfoTooltipPopupOpen, setInfoTooltipPopupOpen] = React.useState(false);
   const [isRegistered, setRegistered] = React.useState(false);
+  const history = useHistory();
 
-  
 
- 
+useEffect(()=>{
+    Promise.all([api.getUserInfo(), api.getInitialCards()])
+    .then(([userInfo, cards]) => {
+        setCards(cards);
+        setCurrentUser(userInfo)
+      }).catch(err => console.log(`${err}`))
+  }, [loggedIn])
 
-  useEffect(() => {
+
+useEffect(() => {
     tokenCheck();
-  }, );
+    // eslint-disable-next-line
+  }, [loggedIn]);
 
   const tokenCheck = () => {
-    const jwt = localStorage.getItem('jwt');
-
-    if (jwt){
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
       authForm.getContent(jwt).then((res) => {
         if (res) {
           setUserData({
-            email: res.email,
-            password: res.password
+            email: res.data.email,
+            password: res.data.password
           });
           setLoggedIn(true);
           history.push('/');
         }
-      });
+      })
+      .catch((err) => {
+        if (err === 401) {
+          console.log(`401 — Переданный токен некорректен`);
+        }
+        if (err === 400) {
+          console.log(`400 — Токен не передан или передан не в том формате`);
+        }
+        history.push('/sign-in');
+      })
     }
   }
 
+  
   const handleRegister = (email, password) => {
     authForm.register(email, password)
       .then(data => {
+        console.log(data)
+        console.log(data.jwt)
         if (data) {
           setUserData({
             email: data.email,
@@ -78,6 +96,7 @@ function App() {
           console.log(`400 - некорректно заполнено одно из полей`);
           setInfoTooltipPopupOpen(true);
           setRegistered(false)
+          history.push('/sign-up');
         }
       });
   }
@@ -90,7 +109,6 @@ function App() {
             email: data.email,
             password: data.password
           });
-          console.log(email)
           setLoggedIn(true);
           history.push('/');
         }
@@ -99,13 +117,15 @@ function App() {
         setInfoTooltipPopupOpen(true);
         setRegistered(false)
         if (err === 401) {
-          console.log(`401 — Переданный токен некорректен`);
+          console.log(`401 - пользователь с email не найден`);
         }
         if (err === 400) {
-          console.log(`400 — Токен не передан или передан не в том формате`);
+          console.log(`400 - не передано одно из полей `);
         }
+        history.push('/sign-in');
       });
   }
+
 
   const onSignOut = () => {
     localStorage.removeItem('jwt');
@@ -114,16 +134,6 @@ function App() {
   }
 
 
-
-  React.useEffect(()=>{
-    Promise.all([api.getUserInfo(), api.getInitialCards()])
-    .then(([userInfo, cards]) => {
-        setCards(cards);
-        setCurrentUser(userInfo)
-      }).catch(err => console.log(`${err}`))
-  }, [])
-
-  
 function handleCardLike(card) {
     const isLiked = card.likes.some(i => i._id === currentUser._id);
     api.changeLikeCardStatus(card._id, !isLiked)
@@ -188,7 +198,6 @@ function handleAddPlaceSubmit(card) {
   };
 
 
- 
   return (
     <div className="page">
       <CurrentUserContext.Provider value={currentUser}>
@@ -210,7 +219,7 @@ function handleAddPlaceSubmit(card) {
             <Register handleRegister={handleRegister} />
           </Route>
         <Route path="/sign-in">
-            <Login handleLogin={handleLogin} tokenCheck={tokenCheck}/>
+            <Login handleLogin={handleLogin} tokenCheck={tokenCheck} />
         </Route>
       <Footer/>
       </Switch>
