@@ -69,7 +69,6 @@ useEffect(() => {
         if (err === 400) {
           console.log(`400 — Токен не передан или передан не в том формате`);
         }
-        history.push('/sign-in');
       })
     }
   }
@@ -78,8 +77,6 @@ useEffect(() => {
   const handleRegister = (email, password) => {
     authForm.register(email, password)
       .then(data => {
-        console.log(data)
-        console.log(data.jwt)
         if (data) {
           setUserData({
             email: data.email,
@@ -96,7 +93,6 @@ useEffect(() => {
           console.log(`400 - некорректно заполнено одно из полей`);
           setInfoTooltipPopupOpen(true);
           setRegistered(false)
-          history.push('/sign-up');
         }
       });
   }
@@ -122,7 +118,6 @@ useEffect(() => {
         if (err === 400) {
           console.log(`400 - не передано одно из полей `);
         }
-        history.push('/sign-in');
       });
   }
 
