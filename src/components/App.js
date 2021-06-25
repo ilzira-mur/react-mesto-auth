@@ -13,7 +13,7 @@ import { Route, Switch, useHistory } from 'react-router-dom';
 import Login from './Login';
 import Register from './Register';
 import ProtectedRoute from './ProtectedRoute';
-import * as authForm from '../utils/authForm';
+import * as auth from '../utils/auth';
 import InfoTooltip from './InfoTooltip';
 
 
@@ -26,12 +26,9 @@ function App() {
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [userData, setUserData] = useState({
-    email: '',
-    password: ''
-  });
+  const [userData, setUserData] = useState({});
   const [isInfoTooltipPopupOpen, setInfoTooltipPopupOpen] = React.useState(false);
-  const [isRegistered, setRegistered] = React.useState(false);
+  const [isAuthSuccess, setAuthSuccess] = React.useState(false);
   const history = useHistory();
 
 
@@ -47,12 +44,12 @@ useEffect(()=>{
 useEffect(() => {
     tokenCheck();
     // eslint-disable-next-line
-  }, [loggedIn]);
+  }, []);
 
   const tokenCheck = () => {
     const jwt = localStorage.getItem("jwt");
     if (jwt) {
-      authForm.getContent(jwt).then((res) => {
+      auth.getContent(jwt).then((res) => {
         if (res) {
           setUserData({
             email: res.data.email,
@@ -75,7 +72,7 @@ useEffect(() => {
 
   
   const handleRegister = (email, password) => {
-    authForm.register(email, password)
+    auth.register(email, password)
       .then(data => {
         if (data) {
           setUserData({
@@ -83,8 +80,7 @@ useEffect(() => {
             password: data.password
           });
           setInfoTooltipPopupOpen(true);
-          setRegistered(true)
-          setLoggedIn(true);
+          setAuthSuccess(true)
           history.push('/sign-up');
         }
       })
@@ -92,13 +88,13 @@ useEffect(() => {
         if (err === 400) {
           console.log(`400 - некорректно заполнено одно из полей`);
           setInfoTooltipPopupOpen(true);
-          setRegistered(false)
+          setAuthSuccess(false)
         }
       });
   }
 
   const handleLogin = (email, password) => {
-    authForm.authorize(email, password)
+    auth.authorize(email, password)
       .then(data => {
         if (data) {
           setUserData({
@@ -110,14 +106,14 @@ useEffect(() => {
         }
       })
       .catch((err) => {
-        setInfoTooltipPopupOpen(true);
-        setRegistered(false)
         if (err === 401) {
           console.log(`401 - пользователь с email не найден`);
         }
         if (err === 400) {
           console.log(`400 - не передано одно из полей `);
         }
+        setInfoTooltipPopupOpen(true);
+        setAuthSuccess(false)
       });
   }
 
@@ -201,7 +197,6 @@ function handleAddPlaceSubmit(card) {
         <ProtectedRoute exact path="/"
               component={Main}
               loggedIn={loggedIn}
-              onSignOut={onSignOut}
               onEditProfile={handleEditProfileClick} 
               onEditAvatar={handleEditAvatarClick} 
               onAddPlace={handleAddPlaceClick}  
@@ -214,7 +209,7 @@ function handleAddPlaceSubmit(card) {
             <Register handleRegister={handleRegister} />
           </Route>
         <Route path="/sign-in">
-            <Login handleLogin={handleLogin} tokenCheck={tokenCheck} />
+            <Login handleLogin={handleLogin} />
         </Route>
       <Footer/>
       </Switch>
@@ -225,7 +220,7 @@ function handleAddPlaceSubmit(card) {
             <button type="submit" className="popup__button popup__button_type_save popup__button_type_small">Да</button>
       </PopupWithForm>
       <ImagePopup card={selectedCard} onClose={closeAllPopups} />
-      <InfoTooltip isOpen={isInfoTooltipPopupOpen} onClose={closeAllPopups} isRegistered={isRegistered} />
+      <InfoTooltip isOpen={isInfoTooltipPopupOpen} onClose={closeAllPopups} isAuthSuccess={isAuthSuccess} />
       </CurrentUserContext.Provider>
     </div>      
   );

@@ -23,3 +23,10 @@
     opacity: 0.85;
     transition: 0.1s linear;
 }
+
+@media screen and (max-width: 767px) {
+    .login__button {
+        width: 260px;
+        margin-top: 173px;
+    }
+  }
