@@ -38,7 +38,7 @@ useEffect(()=>{
         setCards(cards);
         setCurrentUser(userInfo)
       }).catch(err => console.log(`${err}`))
-  }, [loggedIn])
+  }, [])
 
 
 useEffect(() => {
@@ -81,7 +81,7 @@ useEffect(() => {
           });
           setInfoTooltipPopupOpen(true);
           setAuthSuccess(true)
-          history.push('/sign-up');
+          history.push('/sign-in');
         }
       })
       .catch((err) => {
