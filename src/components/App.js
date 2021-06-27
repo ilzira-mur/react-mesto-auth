@@ -46,14 +46,14 @@ useEffect(() => {
     // eslint-disable-next-line
   }, []);
 
+
   const tokenCheck = () => {
     const jwt = localStorage.getItem("jwt");
     if (jwt) {
       auth.getContent(jwt).then((res) => {
         if (res) {
           setUserData({
-            email: res.data.email,
-            password: res.data.password
+            email: res.data.email
           });
           setLoggedIn(true);
           history.push('/');
@@ -65,6 +65,9 @@ useEffect(() => {
         }
         if (err === 400) {
           console.log(`400 — Токен не передан или передан не в том формате`);
+        }
+        else {
+          console.log(`${err}`)
         }
       })
     }
@@ -98,8 +101,8 @@ useEffect(() => {
       .then(data => {
         if (data) {
           setUserData({
-            email: data.email,
-            password: data.password
+            email: email,
+            password: password
           });
           setLoggedIn(true);
           history.push('/');
@@ -211,8 +214,8 @@ function handleAddPlaceSubmit(card) {
         <Route path="/sign-in">
             <Login handleLogin={handleLogin} />
         </Route>
-      <Footer/>
       </Switch>
+      {loggedIn && <Footer />}
       <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
       <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} />
       <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />

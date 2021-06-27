@@ -4,11 +4,10 @@ import { Route, Link, Switch } from 'react-router-dom';
 
 function Header(props) {
     
+    
     return (
         <header className="header">
-            <a className="link" href="/#" target="_self">
-            <img className="header__logo" src={logo} alt="Логотип"/>
-            </a>
+            <Link to="/" className="link"><img className="header__logo" src={logo} alt="Логотип"/></Link>
             <div className="header__login">
                 <Switch>
                     <Route path="/sign-up">
